@@ -76,10 +76,10 @@ def go_right():
 
 # Keyboard bindings
 wn.listen()
-wn.onkeypress(go_up, "z")
-wn.onkeypress(go_down, "s")
-wn.onkeypress(go_left, "a")
-wn.onkeypress(go_right, "e")
+wn.onkeypress(go_up, "Up")
+wn.onkeypress(go_down, "Down")
+wn.onkeypress(go_left, "Left")
+wn.onkeypress(go_right, "Right")
 
 # Main game loop
 while True:
