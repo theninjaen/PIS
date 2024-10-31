@@ -15,55 +15,81 @@ high_score = 0
 # Set up the window
 wn = turtle.Screen()
 wn.title("Snake Game")
-wn.bgcolor("green")
+wn.bgcolor("light green")
 wn.setup(width=600, height=600)
 wn.tracer(0)
 
-# Snake head
-head = turtle.Turtle()
-head.speed(0)
-head.shape("square")
-head.color("black")
-head.penup()
-head.goto(0, 0)
-head.direction = "stop"
+# Reset head
+def reset_head(head, shape, color, x, y, direction):
+    head.speed(0)
+    head.shape(shape)
+    head.color(color)
+    head.penup()
+    head.goto(x, y)
+    head.direction = direction
+
+# Add one segment to a segments list
+def add_segment(segments, color, shape):
+    new_segment = turtle.Turtle()
+    new_segment.speed(0)
+    new_segment.shape(shape)
+    new_segment.color(color)
+    new_segment.penup()
+    segments.append(new_segment)
+
 
 # Snake food
 food = turtle.Turtle()
 food.speed(0)
-food.shape("circle")
-food.color("red")
+food.shape("turtle")
+food.color("black")
 food.penup()
-food.goto(random.randint(-290, 290), random.randint(-290, 290))
+food.goto(random.randint(-200, 200), random.randint(-200, 200))
 
-# Body segments
-segments = []
 
-# Pen
+# Snake head
+snake_head = turtle.Turtle()
+reset_head(snake_head, "square", "black", 0, 0, "stop")
+
+# Snake body
+snake_segments = []
+
+# Ennemy head
+ennemy_head = turtle.Turtle()
+x = random.randint(-200, 200)
+y = random.randint(-200, 200)
+reset_head(ennemy_head, "circle", "firebrick2", x, y, "stop")
+
+# Ennemy body
+ennemy_segments = []
+
+
+# Pen (score)
 pen = turtle.Turtle()
 pen.speed(0)
 pen.shape("square")
-pen.color("white")
+pen.color("black")
 pen.penup()
 pen.hideturtle()
 pen.goto(0, 260)
 pen.write("Score: 0  High Score: 0", align="center", font=("Courier", 24, "normal"))
 
 # Functions to control the snake
-def go_up():
+def go_up(head):
     if head.direction != "down":
         head.direction = "up"
-def go_down():
+def go_down(head):
     if head.direction != "up":
         head.direction = "down"
-def go_left():
+def go_left(head):
     if head.direction != "right":
         head.direction = "left"
-def go_right():
+def go_right(head):
     if head.direction != "left":
         head.direction = "right"
 
-def move():
+# Move head function
+def move_head(head):
     if head.direction == "up":
         head.sety(head.ycor() + 20)
     if head.direction == "down":
@@ -73,40 +99,61 @@ def move():
     if head.direction == "right":
         head.setx(head.xcor() + 20)
 
+# Move body function
+def move_body(segments, head):
+    for index in range(len(segments) - 1, 0, -1):
+        x = segments[index - 1].xcor()
+        y = segments[index - 1].ycor()
+        segments[index].goto(x, y)
+    if len(segments) > 0:
+        x = head.xcor()
+        y = head.ycor()
+        segments[0].goto(x, y)
+
+# Reset game
 def reset_game():
-    global score, delay
+    global score, delay, snake_segments
     time.sleep(1)
-    head.goto(0, 0)
-    head.direction = "stop"
-    for segment in segments:
+    reset_head(snake_head, "square", "black", 0, 0, "stop")
+    reset_head(ennemy_head, "circle", "firebrick2", random.randint(-200, 200), random.randint(-200, 200), "stop")
+    for segment in snake_segments:
         segment.goto(10000, 10000)
-    segments.clear()
+    snake_segments.clear()
+    for segment in ennemy_segments:
+        segment.goto(10000, 10000)
+    ennemy_segments.clear()
+
+    x = random.randint(-290, 290)
+    y = random.randint(-290, 290)
+    food.goto(x, y)
+
     score = 0
     delay = 0.1
     pen.clear()
     pen.write("Score: {}  High Score: {}".format(score, high_score), align="center", font=("Courier", 24, "normal"))
 
+# Game loop
 def game_loop():
     global delay, score, high_score
 
     wn.update()
 
     # Check for collision with border
-    if head.xcor() > 290 or head.xcor() < -290 or head.ycor() > 290 or head.ycor() < -290:
+    if snake_head.xcor() > 290 or snake_head.xcor() < -290 or snake_head.ycor() > 290 or snake_head.ycor() < -290:
         reset_game()
+    if ennemy_head.xcor() > 290: go_left(ennemy_head)
+    if ennemy_head.xcor() < -290: go_right(ennemy_head)
+    if ennemy_head.ycor() > 290: go_down(ennemy_head)
+    if ennemy_head.ycor() < -290: go_up(ennemy_head)
 
     # Check for collision with food
-    if head.distance(food) < 20:
+    if snake_head.distance(food) < 20:
         x = random.randint(-290, 290)
         y = random.randint(-290, 290)
         food.goto(x, y)
 
-        new_segment = turtle.Turtle()
-        new_segment.speed(0)
-        new_segment.shape("square")
-        new_segment.color("grey")
-        new_segment.penup()
-        segments.append(new_segment)
+        add_segment(snake_segments, "SlateBlue3", "square")
+        add_segment(ennemy_segments, "firebrick2", "circle")
 
         # The snake is going faster
         delay -= 0.0001
@@ -120,32 +167,48 @@ def game_loop():
         pen.clear()
         pen.write("Score: {}  High Score: {}".format(score, high_score), align="center", font=("Courier", 24, "normal"))
 
-    for index in range(len(segments) - 1, 0, -1):
-        x = segments[index - 1].xcor()
-        y = segments[index - 1].ycor()
-        segments[index].goto(x, y)
 
-    if len(segments) > 0:
-        x = head.xcor()
-        y = head.ycor()
-        segments[0].goto(x, y)
+    # Move the snake segments
+    move_body(snake_segments, snake_head)
+    move_head(snake_head)
 
-    move()
+    # Move the ennemy segments
+    move_body(ennemy_segments, ennemy_head)
+    ennemy_direction = random.choice(["up", "down", "left", "right"])
+    ennemy_head.direction = ennemy_direction
+    move_head(ennemy_head)
 
     # Check for collision with body segments
-    for segment in segments:
-        if segment.distance(head) < 20:
+    for segment in snake_segments:
+        if segment.distance(snake_head) < 10:
             reset_game()
+
+    # Check for collision with ennemy segments and ennemy head
+    if ennemy_head.distance(snake_head) < 20:
+            reset_game()
+    for segment in ennemy_segments:
+        if segment.distance(snake_head) < 20:
+            reset_game()
+    for segment in snake_segments:
+        if segment.distance(ennemy_head) < 20:
+            reset_game()
+    for ennemy_segment in ennemy_segments:
+        for snake_segment in snake_segments:
+            if ennemy_segment.distance(snake_segment) < 20:
+                reset_game()
 
     turtle.ontimer(game_loop, int(delay * 1000))
 
+
+
+# Read input
 def read_arduino():
     while True:
         wn.listen() 
-        wn.onkeypress(go_up, "Up")
-        wn.onkeypress(go_down, "Down")
-        wn.onkeypress(go_left, "Left")
-        wn.onkeypress(go_right, "Right")
+        wn.onkeypress(lambda: go_up(snake_head), "Up")
+        wn.onkeypress(lambda: go_down(snake_head), "Down")
+        wn.onkeypress(lambda: go_left(snake_head), "Left")
+        wn.onkeypress(lambda: go_right(snake_head), "Right")
 """         if arduino.in_waiting > 0:
             data = arduino.readline().decode().strip()
             if data == 'UP':
