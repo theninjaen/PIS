@@ -1,11 +1,22 @@
 import turtle
+import PySimpleGUI as sg
 import threading
 import time
 import random
+import sys
 import serial
 
-""" # Initialize serial communication
-arduino = serial.Serial('/dev/ttyACM0', 9600)  # Replace '/dev/ttyACM0' with your Arduino's serial port """
+"""  # Set up serial communication
+try:
+    ser = serial.Serial('COM4', baudrate=9600, timeout=1)
+    ser.flushInput()
+    shouldRead = True
+except serial.SerialException:
+    print('Serial port not found.... Check USB connection', file=sys.stderr)
+    shouldRead = False 
+latest_weight = None """
+
+
 
 delay = 0.1
 # Score
@@ -73,6 +84,17 @@ pen.penup()
 pen.hideturtle()
 pen.goto(0, 260)
 pen.write("Score: 0  High Score: 0", align="center", font=("Courier", 24, "normal"))
+
+# Pen (weight)
+pen_weight = turtle.Turtle()
+pen_weight.speed(0)
+pen_weight.shape("square")
+pen_weight.color("black")
+pen_weight.penup()
+pen_weight.hideturtle()
+pen_weight.goto(0, -260)
+pen_weight.write("Weight: 0", align="center", font=("Courier", 24, "normal"))
+
 
 # Functions to control the snake
 def go_up(head):
@@ -178,6 +200,11 @@ def game_loop():
     ennemy_head.direction = ennemy_direction
     move_head(ennemy_head)
 
+    # Write the weight
+    # TODO
+    # pen_weight.clear()
+    # pen_weight.write("Weight: {}".format(latest_weight), align="center", font=("Courier", 24, "normal"))
+
     # Check for collision with body segments
     for segment in snake_segments:
         if segment.distance(snake_head) < 10:
@@ -209,7 +236,17 @@ def read_arduino():
         wn.onkeypress(lambda: go_down(snake_head), "Down")
         wn.onkeypress(lambda: go_left(snake_head), "Left")
         wn.onkeypress(lambda: go_right(snake_head), "Right")
-"""         if arduino.in_waiting > 0:
+
+    global ser, latest_weight, shouldRead
+    while shouldRead:
+        try:
+            ser_bytes = ser.readline().decode("utf-8").strip()
+            latest_weight = float(ser_bytes)
+            print(latest_weight)
+        except (serial.SerialException, PermissionError, ValueError):
+            shouldRead = False
+            print('Stopped Reading.... Check USB Connection', file=sys.stderr)
+        if ser.in_waiting > 0:
             data = arduino.readline().decode().strip()
             if data == 'UP':
                 go_up()
@@ -218,7 +255,7 @@ def read_arduino():
             elif data == 'LEFT':
                 go_left()
             elif data == 'RIGHT':
-                go_right() """
+                go_right()
         
 
 # Start the Arduino reading thread
