@@ -1,4 +1,4 @@
-from main import window, snake
+from main import window, snake_head
 from game_logic import DIRECTIONS, change_direction
 import threading
 
@@ -6,7 +6,7 @@ def read_keyboard():
     while True:
         window.listen()
         for direction in DIRECTIONS:
-            window.onkeypress(lambda: change_direction(snake, direction), direction)
+            window.onkeypress(lambda: change_direction(snake_head, direction), direction)
 
 def setup_keyboard_reader():
     '''
