@@ -1,5 +1,4 @@
 import turtle
-import PySimpleGUI as sg
 import threading
 import time
 import random
