@@ -125,8 +125,8 @@ def check_food_collision(snake_head, snake_body, enemy_head, enemy_body, food, p
     if snake_head.distance(food) >= 20:
         return
     
-    x = random.randint(-290, 290)
-    y = random.randint(-290, 290)
+    x = random.randint(-29, 29) * 10
+    y = random.randint(-29, 29) * 10
     food.goto(x, y)
 
     snake_body.append(create_segment("square", "SlateBlue3", snake_head.xcor(), snake_head.ycor()))

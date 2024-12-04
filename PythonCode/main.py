@@ -25,13 +25,13 @@ snake_body = []
 
 setup_keyboard_reader(window, snake_head)
 
-enemy_start_x = random.randint(-200, 200)
-enemy_start_y = random.randint(-200, 200)
+enemy_start_x = random.randint(-20, 20) * 10
+enemy_start_y = random.randint(-20, 20) * 10
 enemy_head = create_segment("circle", "firebrick2", enemy_start_x, enemy_start_y)
 enemy_body = []
 
-food_start_x = random.randint(-200, 200)
-food_start_y = random.randint(-200, 200)
+food_start_x = random.randint(-20, 20) * 10
+food_start_y = random.randint(-20, 20) * 10
 food = create_segment("turtle", "black", food_start_x,food_start_y)
 
 def game_loop():
