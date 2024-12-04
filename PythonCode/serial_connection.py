@@ -1,4 +1,3 @@
-from main import MAX_UPDATE_INTERVAL
 import serial
 import threading
 import sys
@@ -7,6 +6,7 @@ serial_connection = None
 should_read = False
 
 MAX_WEIGHT = 30
+MAX_UPDATE_INTERVAL = 0.35
 
 weight_adjusted_interval = MAX_UPDATE_INTERVAL
 weight = MAX_WEIGHT
@@ -41,12 +41,14 @@ def read_arduino():
             ser_bytes = serial_connection.readline().decode("utf-8").strip()
             weight = float(ser_bytes)
             weight = clamp(weight, 0, MAX_WEIGHT)
-            
             weight_adjusted_interval = MAX_UPDATE_INTERVAL - (weight / MAX_WEIGHT * MAX_UPDATE_INTERVAL)
         except (serial.SerialException, PermissionError, ValueError) as e:
             print(str(e))
             should_read = False
             print('Stopped Reading.... Check USB Connection', file=sys.stderr)
+
+def read_weight_adjusted_interval():
+    return weight_adjusted_interval
 
 def clamp(input, min, max):
     '''

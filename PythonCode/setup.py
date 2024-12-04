@@ -10,7 +10,7 @@ def create_segment(shape, color, x, y):
     head.color(color)
     head.penup()
     head.goto(x, y)
-    head.direction = None
+    head.direction = "Stop"
     return head
 
 def setup_pen():
