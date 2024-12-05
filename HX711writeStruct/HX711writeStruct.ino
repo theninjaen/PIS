@@ -27,10 +27,10 @@ void loop() {
   // Serial.print(weight);
   // Serial.println(" kg");  // Assuming the weight is in kilograms
 
+  Serial.print("Weight: ");
   Serial.print(scale.get_units(), 1);
-  Serial.println();
-  Serial.print(beat);
-  Serial.println();
+  Serial.print(" Heartbeat: ");
+  Serial.println(beat);
   
   delay(1000/30);  // Add a delay to control the rate of data sending
 }
