@@ -31,7 +31,8 @@ def readingFunction():
             ser_bytes = ser.readline().decode("utf-8").strip()
             latest_weight = float(ser_bytes)
             print(latest_weight)
-        except (serial.SerialException, PermissionError, ValueError):
+        except (serial.SerialException, PermissionError, ValueError) as e:
+            print(str(e))
             shouldRead = False
             print('Stopped Reading.... Check USB Connection', file=sys.stderr)
 

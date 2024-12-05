@@ -169,12 +169,12 @@ def game_loop():
         weight_change = instant_weight - latest_weight  
         player_delay = max(0.1, player_delay - 0.005 * weight_change)
 
-    while not heartrate_queue.empty():
-        heart_rate = heartrate_queue.get()
-        if heart_rate > 80:
-            enemy_delay = max(0.1, enemy_delay - 0.02 * (heart_rate - 80))
-        else:
-            enemy_delay = 0.5
+    # while not heartrate_queue.empty():
+    #     heart_rate = heartrate_queue.get()
+    #     if heart_rate > 80:
+    #         enemy_delay = max(0.1, enemy_delay - 0.02 * (heart_rate - 80))
+    #     else:
+    #         enemy_delay = 0.5
 
     # Check for collision with border
     if snake_head.xcor() > 290 or snake_head.xcor() < -290 or snake_head.ycor() > 290 or snake_head.ycor() < -290:
@@ -269,8 +269,8 @@ wn.onkeypress(lambda: go_right(snake_head), "d")
 # Start threads
 arduino_thread = threading.Thread(target=read_arduino)
 arduino_thread.start()
-heartrate_thread = threading.Thread(target=read_heart_rate)
-heartrate_thread.start()
+# heartrate_thread = threading.Thread(target=read_heart_rate)
+# heartrate_thread.start()
 
 # Start game loop
 game_loop()
