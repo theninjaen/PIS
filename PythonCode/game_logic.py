@@ -13,10 +13,10 @@ def enemy_decide_direction(enemy_head):
     '''
     possible_directions = DIRECTIONS.copy()
 
-    if enemy_head.xcor() > 270: possible_directions.remove("Right")
-    if enemy_head.xcor() < -270: possible_directions.remove("Left")
-    if enemy_head.ycor() > 270: possible_directions.remove("Up")
-    if enemy_head.ycor() < -270: possible_directions.remove("Down")
+    if enemy_head.xcor() > 270:     possible_directions.remove("Right")
+    if enemy_head.xcor() < -270:    possible_directions.remove("Left")
+    if enemy_head.ycor() > 270:     possible_directions.remove("Up")
+    if enemy_head.ycor() < -270:    possible_directions.remove("Down")
 
     return random.choice(possible_directions)
 
@@ -42,6 +42,8 @@ def move(head, segments):
         head.setx(head.xcor() - 20)
     if head.direction == "Right":
         head.setx(head.xcor() + 20)
+    
+    head.last_direction_moved = head.direction
 
 def change_direction(head, direction):
     '''
@@ -51,7 +53,7 @@ def change_direction(head, direction):
         head.direction = direction
         return
 
-    index = (DIRECTIONS.index(head.direction) + (len(DIRECTIONS) / 2)) % len(DIRECTIONS)
+    index = (DIRECTIONS.index(head.last_direction_moved) + (len(DIRECTIONS) / 2)) % len(DIRECTIONS)
     opposite_direction = DIRECTIONS[int(index)]
 
     if direction != opposite_direction:
@@ -80,8 +82,8 @@ def reset_game(snake_head, snake_body, enemy_head, enemy_body, food, pen,):
         segment.goto(10000, 10000)
     enemy_body.clear()
 
-    x = random.randint(-290, 290)
-    y = random.randint(-290, 290)
+    x = random.randint(-29, 29) * 10
+    y = random.randint(-29, 29) * 10
     food.goto(x, y)
 
     score = 0
@@ -89,29 +91,31 @@ def reset_game(snake_head, snake_body, enemy_head, enemy_body, food, pen,):
     pen.write("Score: {}  High Score: {}".format(score, high_score), align="center", font=("Courier", 24, "normal"))
 
     reset_head(snake_head, "square", "black", 0, 0, "Stop")
-    reset_head(enemy_head, "circle", "firebrick2", random.randint(-200, 200), random.randint(-200, 200), "Stop")
+    reset_head(enemy_head, "circle", "firebrick2", random.randint(-20, 20) * 10, random.randint(-20, 20) * 10, "Stop")
 
 def check_death_collisions(snake_head, snake_body, enemy_head, enemy_body, food, pen):
     '''
     Checks for collisions that kill the player, and resets the game if they occur
     '''
-    # Check for collision with body segments
+    # Check for collision between snake head and body
     for segment in snake_body:
         if segment.distance(snake_head) < 10:
             reset_game(snake_head, snake_body, enemy_head, enemy_body, food, pen,)
     
-    # Check for collision with border
+    # Check for collision between snake heas and border
     if snake_head.xcor() > 290 or snake_head.xcor() < -290 or snake_head.ycor() > 290 or snake_head.ycor() < -290:
         reset_game(snake_head, snake_body, enemy_head, enemy_body, food, pen,)
 
-    # Check for collision with enemy segments and enemy head
+    # Check for collision between snake head and enemy head
     if enemy_head.distance(snake_head) < 20:
         reset_game(snake_head, snake_body, enemy_head, enemy_body, food, pen,)
 
+    # Check for collisions between snake head and enemy body
     for segment in enemy_body:
         if snake_head.distance(segment) < 20:
             reset_game(snake_head, snake_body, enemy_head, enemy_body, food, pen,)
-            
+
+    # Check for collisions between enemy head and snake body
     for segment in snake_body:
         if enemy_head.distance(segment) < 20:
             reset_game(snake_head, snake_body, enemy_head, enemy_body, food, pen,)
